@@ -3,6 +3,7 @@
 #include <fstream>
 #include <vector>
 #include <cmath>
+#include <omp.h>
 using namespace std;
 typedef vector<vector<float>> matrix;
 
@@ -36,6 +37,7 @@ int main() {
   ofstream vfile("v.dat");
   ofstream pfile("p.dat");
   for (int n = 0; n < nt; n++) {
+    #pragma omp parallel for collapse(2)
     for (int j = 1; j < ny - 1; j++) {
       for (int i = 1; i < nx - 1; i++) {
         // Compute b[j][i]
@@ -48,12 +50,14 @@ int main() {
     }
 
     for (int it = 0; it < nit; it++) {
+      #pragma omp parallel for collapse(2)
       for (int j = 0; j < ny; j++) {
         for (int i = 0; i < nx; i++) {
             pn[j][i] = p[j][i];
         }
       }
 
+      #pragma omp parallel for collapse(2)
       for (int j = 1; j < ny - 1; j++) {
         for (int i = 1; i < nx - 1; i++) {
           // Compute p[j][i]
@@ -74,6 +78,7 @@ int main() {
       }
     }
 
+    #pragma omp parallel for collapse(2)
     for (int j = 0; j < ny; j++) {
       for (int i = 0; i < nx; i++) {
         un[j][i] = u[j][i];
@@ -81,6 +86,7 @@ int main() {
       }
     }
 
+    #pragma omp parallel for collapse(2)
     for (int j = 1; j < ny - 1; j++) {
       for (int i = 1; i < nx - 1; i++) {
         // Compute u[j][i]
